@@ -65,7 +65,7 @@ IP                       =  55813                   $Inflation Pressure
 IP_NOM                   =  55813                   $Nominal Inflation Pressure
 $-----------------------------------------------------------------STRUCTURAL
 [STRUCTURAL]
-LATERAL_STIFFNESS        = 1                        $Lateral Stiffness (Added as a placeholder by rhorvath@utexas.edu)
+LATERAL_STIFFNESS        = 47700                    $Lateral Stiffness (Added as a placeholder by rhorvath@utexas.edu)
 $-----------------------------------------------------------------DIMENSIONS
 [DIMENSION]
 UNLOADED_RADIUS          =  0.2024                  $Free tyre radius

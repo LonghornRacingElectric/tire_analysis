@@ -63,6 +63,9 @@ $-----------------------------------------------------------------TYRE_CONDITION
 [TYRE_CONDITIONS]
 IP                       =  83441                   $Inflation Pressure
 IP_NOM                   =  83441                   $Nominal Inflation Pressure
+$-----------------------------------------------------------------STRUCTURAL
+[STRUCTURAL]
+LATERAL_STIFFNESS        = 47700                    $Lateral Stiffness (Added as a placeholder by rhorvath@utexas.edu)
 $-----------------------------------------------------------------DIMENSIONS
 [DIMENSION]
 UNLOADED_RADIUS          =  0.2045                  $Free tyre radius

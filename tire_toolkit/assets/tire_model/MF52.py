@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 
 from .file_processing._process_tir import _Processor
 
-from .MF52_calculations._lateral_force import get_F_y
 # from .MF52_calculations._longitudinal_force import
-# from .MF52_calculations._aligning_moment import
+from .MF52_calculations._lateral_force import get_F_y
+from .MF52_calculations._aligning_moment import get_M_z
 
 
 import pandas as pd
@@ -53,7 +53,21 @@ class MF52:
             gamma = gamma
         )[1]
 
-        return [0, F_y_result, FZ, 0, 0, 0]
+        MZ_result = get_M_z(
+            aligning_coeffs = self._aligning_coeffs,
+            scaling_coeffs = self.scaling_coeffs,
+            lat_coeffs = self._lat_coeffs,
+            long_coeffs = self._long_coeffs,
+            vertical_coeffs = self._vertical_coeffs,
+            dimensions = self._dimensions,
+            operating_conditions = self._operating_conds,
+            FZ = FZ,
+            alpha = alpha,
+            kappa = kappa,
+            gamma = gamma
+        )[1]
+
+        return [0, F_y_result, FZ, 0, 0, MZ_result]
 
     def get_cornering_stiffness(self, FZ: float = 0, x_1: float = 0, x_2: float = 0.25, alpha: float = 0, kappa: float = 0, gamma: float = 0) -> float:
         if FZ == 0:
