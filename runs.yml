@@ -24,7 +24,7 @@ Scale Virtual Tires:
   ]
   Minimum FZ: 100
   Maximum FZ: 1091
-  Weighting: [1, 1, 1, 1, 1, 1, 1, 1] # [mu_x, mu_y, C_alpha, C-mz, alpha_at_peak_fy, slip_stffienss, alpha_at_peak_Mz, kappa_at_peak_Fx]
+  Weighting: [1, 1, 1, 1, 1, 1, 1, 1, 0] # [mu_x, mu_y, C_alpha, C-mz, alpha_at_peak_fy, slip_stffienss, alpha_at_peak_Mz, kappa_at_peak_Fx, C_gamma]
   Refinement: 10 # Leave as 10 for now
 
 

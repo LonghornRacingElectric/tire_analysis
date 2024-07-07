@@ -39,7 +39,8 @@ class Analysis:
         fig, axes = plt.subplots(2, 3)
         fig2, axes2 = plt.subplots(2, 3)
 
-        plt.subplots_adjust(left = 0.1, right = 0.9, bottom = 0.15, top = 0.85, wspace = 0.6, hspace = 0.5)
+        fig.subplots_adjust(left = 0.1, right = 0.9, bottom = 0.15, top = 0.85, wspace = 0.6, hspace = 0.5)
+        fig2.subplots_adjust(left = 0.1, right = 0.9, bottom = 0.15, top = 0.85, wspace = 0.6, hspace = 0.5)
 
         fig.set_figwidth(12)
         fig.set_figheight(8)
@@ -186,8 +187,8 @@ class Analysis:
             # Camber Stiffness
             axes2[1, 1].plot(FZ_sweep, C_gamma)
 
-        fig.legend(tire_names, fontsize = "10", bbox_to_anchor = (1, 1))
-        fig2.legend(tire_names, fontsize = "10", bbox_to_anchor = (1, 1))
+        fig.legend(tire_names, fontsize = "8", bbox_to_anchor = (1, 1))
+        fig2.legend(tire_names, fontsize = "8", bbox_to_anchor = (1, 1))
 
         return [fig, fig2]
 
@@ -248,7 +249,9 @@ class Analysis:
                 (0.5, 3), # Rolling resistance torque
                 (0.5, 3), # Nominal inflation pressure
                 ],
-            method = "SLSQP").x
+            method = "SLSQP",
+            # method = "Nelder-Mead"
+            ).x
         
         self.set_scaling_coeffs(self.target_tire.tire_name, gen_soln, output_tir = False)
 
@@ -326,8 +329,8 @@ class Analysis:
             ref_C_y = self.reference_tire.get_cornering_stiffness(FZ, 0, 0.25)
             iter_C_y = self.target_tire.get_cornering_stiffness(FZ, 0, 0.25)
 
-            ref_C_mz = self.reference_tire.get_aligning_stiffness(FZ, 0, 0.25)
-            iter_C_mz = self.target_tire.get_aligning_stiffness(FZ, 0, 0.25)
+            ref_C_mz = self.reference_tire.get_aligning_stiffness(FZ, 0.001, 0.25)
+            iter_C_mz = self.target_tire.get_aligning_stiffness(FZ, 0.001, 0.25)
 
             ref_peak_Fy_alpha = self.reference_tire.get_peak_F_y_alpha(FZ)
             iter_peak_Fy_alpha = self.target_tire.get_peak_F_y_alpha(FZ)
@@ -341,6 +344,9 @@ class Analysis:
             ref_peak_Fx_kappa = self.reference_tire.get_peak_F_x_kappa(FZ)
             iter_peak_Fx_kappa = self.target_tire.get_peak_F_x_kappa(FZ)
 
+            ref_C_gamma = self.reference_tire.get_camber_stiffness(FZ)
+            iter_C_gamma = self.target_tire.get_camber_stiffness(FZ)
+
             # residuals.append((ref_mu_x - iter_mu_x) / ref_mu_x * 100 * self.weighting[0])
             residuals.append((ref_mu_y - iter_mu_y) / ref_mu_y * 100 * self.weighting[1])
             residuals.append((ref_C_y - iter_C_y) / ref_C_y * 100 * self.weighting[2])
@@ -349,6 +355,7 @@ class Analysis:
             # residuals.append((ref_slip_stiff - iter_slip_stiff) / ref_slip_stiff * 100 * self.weighting[5])
             # residuals.append((ref_peak_Mz_alpha - iter_peak_Mz_alpha) / ref_peak_Mz_alpha * 100 * self.weighting[6])
             # residuals.append((ref_peak_Fx_kappa - iter_peak_Fx_kappa) / ref_peak_Fx_kappa * 100 * self.weighting[7])
+            residuals.append((ref_C_gamma - iter_C_gamma) / ref_C_gamma * 100 * self.weighting[8])
         
         print(f"\rResidual Norm: {round(np.linalg.norm(residuals), 2)}          ", end = "")
         
