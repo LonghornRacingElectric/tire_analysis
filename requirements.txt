@@ -2,3 +2,6 @@ numpy
 matplotlib
 pyQt5
 pandas
+scipy
+pygit
+pyyaml
