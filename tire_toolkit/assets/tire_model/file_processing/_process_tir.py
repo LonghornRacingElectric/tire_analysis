@@ -27,7 +27,7 @@ class _Processor:
                     line_stripped = line_stripped[:line_stripped.index("$")]
 
                 line_split = line_stripped.split("=")
-                if line_split[1].replace(".", "").replace("-", "").replace("E", "").replace("e", "").replace("+", "").isnumeric():
+                if line_split[1].replace(".", "").replace("-", "").replace("E", "").replace("e", "").replace("+", "").replace("\n", "").isnumeric():
                     val = float(line_split[1])
                 
                 else:

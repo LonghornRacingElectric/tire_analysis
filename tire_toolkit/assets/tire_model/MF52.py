@@ -6,8 +6,10 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from .file_processing._process_tir import _Processor
 
-# from .MF52_calculations._longitudinal_force import
+from .MF52_calculations._longitudinal_force import get_F_x
 from .MF52_calculations._lateral_force import get_F_y
+from .MF52_calculations._overturning_moment import get_M_x
+from .MF52_calculations._rolling_resistance import get_M_y
 from .MF52_calculations._aligning_moment import get_M_z
 
 
@@ -18,11 +20,12 @@ class MF52:
 
         self._init_coeffs()
         self._init_consts()
-        self._pure_slip_metrics = self._param_eval(self._vertical_coeffs["FNOMIN"])
 
     def _init_coeffs(self) -> None:
         self._lat_coeffs = self._tire_params.get_parameters("LATERAL_COEFFICIENTS")
         self._long_coeffs = self._tire_params.get_parameters("LONGITUDINAL_COEFFICIENTS")
+        self._overturning_coeffs = self._tire_params.get_parameters("OVERTURNING_COEFFICIENTS")
+        self._rolling_coeffs = self._tire_params.get_parameters("ROLLING_COEFFICIENTS")
         self._aligning_coeffs = self._tire_params.get_parameters("ALIGNING_COEFFICIENTS")
 
         self.scaling_coeffs = self._tire_params.get_parameters("SCALING_COEFFICIENTS")
@@ -41,11 +44,19 @@ class MF52:
 
     def tire_eval(self, FZ: float, alpha: float, kappa: float, gamma: float) -> list[float]:
         
-        # F_x_result = get_F_x(
+        mu_x, F_x_result = get_F_x(
+            long_coeffs = self._long_coeffs,
+            scaling_coeffs = self.scaling_coeffs,
+            vertical_coeffs = self._vertical_coeffs,
+            dimensions = self._dimensions,
+            operating_conditions = self._operating_conds, 
+            FZ = FZ,
+            alpha = alpha,
+            kappa = kappa,
+            gamma = gamma
+        )
 
-        # )
-
-        F_y_result = get_F_y(
+        mu_y, F_y_result = get_F_y(
             lat_coeffs = self._lat_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
@@ -55,7 +66,33 @@ class MF52:
             alpha = alpha,
             kappa = kappa,
             gamma = gamma
-        )[1]
+        )
+
+        Mx_result = get_M_x(
+            overturning_coeffs = self._overturning_coeffs,
+            scaling_coeffs = self.scaling_coeffs,
+            vertical_coeffs = self._vertical_coeffs,
+            dimensions = self._dimensions,
+            operating_conditions = self._operating_conds, 
+            FZ = FZ,
+            alpha = alpha,
+            kappa = kappa,
+            gamma = gamma,
+            Fy = F_y_result
+        )
+
+        My_result = get_M_y(
+            rolling_coeffs = self._rolling_coeffs,
+            long_coeffs = self._long_coeffs,
+            scaling_coeffs = self.scaling_coeffs,
+            vertical_coeffs = self._vertical_coeffs,
+            dimensions = self._dimensions,
+            operating_conditions = self._operating_conds, 
+            FZ = FZ,
+            alpha = alpha,
+            kappa = kappa,
+            gamma = gamma
+        )
 
         self.pneu_trail, MZ_result = get_M_z(
             aligning_coeffs = self._aligning_coeffs,
@@ -71,7 +108,7 @@ class MF52:
             gamma = gamma
         )
 
-        return [F_y_result, F_y_result, FZ, 0, 0, MZ_result]
+        return [F_x_result, F_y_result, FZ, Mx_result, My_result, MZ_result]
 
     def get_cornering_stiffness(self, FZ: float = 0, x_1: float = 0, x_2: float = 0.25, alpha: float = 0, kappa: float = 0, gamma: float = 0) -> float:
         if FZ == 0:
@@ -141,7 +178,7 @@ class MF52:
             return list(kappa_sweep)[list(FX).index(min(FX))]
 
         else:
-            kappa = minimize(lambda x: -1 * self.tire_eval(FZ = FZ, alpha = x[0] * np.pi / 180, kappa = 0, gamma = 0)[5], x0 = [2], bounds = [(0, 90)], method = "SLSQP").x
+            kappa = minimize(lambda x: -1 * self.tire_eval(FZ = FZ, alpha = 0 * np.pi / 180, kappa = x[0], gamma = 0)[0], x0 = [2], bounds = [(0, 1)], method = "SLSQP").x
 
             return kappa[0]
 
@@ -171,9 +208,19 @@ class MF52:
         if FZ == 0:
             FZ = self._vertical_coeffs["FNOMIN"]
         
-        # mu_x_result = 
+        mu_x_result, F_x_result = get_F_x(
+            long_coeffs = self._long_coeffs,
+            scaling_coeffs = self.scaling_coeffs,
+            vertical_coeffs = self._vertical_coeffs,
+            dimensions = self._dimensions,
+            operating_conditions = self._operating_conds, 
+            FZ = FZ,
+            alpha = alpha,
+            kappa = kappa,
+            gamma = gamma
+        )
 
-        mu_y_result = F_y_result = get_F_y(
+        mu_y_result, F_y_result = get_F_y(
             lat_coeffs = self._lat_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
@@ -183,9 +230,9 @@ class MF52:
             alpha = alpha,
             kappa = kappa,
             gamma = gamma
-        )[0]
+        )
 
-        return [0, mu_y_result]
+        return [mu_x_result, mu_y_result]
 
     def get_lateral_stiffness(self):
         return self.structural["LATERAL_STIFFNESS"]

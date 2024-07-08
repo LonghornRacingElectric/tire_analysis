@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import time
 
+from scipy.optimize import basinhopping
 from scipy.optimize import minimize
 
 from .MF52 import MF52
@@ -216,39 +217,30 @@ class Analysis:
 
         start = time.time()
 
-        gen_soln = minimize(self._full_eval, [1 for x in range(31)], bounds=[
-                (0.5, 2), # Nominal Load
-                (0.5, 2), # Fx shape factor
-                (0.5, 2), # Fx peak friction coeff
-                (0.5, 2), # Fx curvature
-                (0.5, 2), # Fx slip stiffness
-                (-3, 3),  # Fx horizontal shift
-                (-3, 3),  # Fx vertical shift
-                (-3, 3),  # TODO: I don't remember what this coeff scales
-                (-3, 3),  # Camber for Fx
-                (0.5, 2), # Fy shape factor
-                (0.5, 2), # Fy peak friction coefficient
-                (0.5, 2), # Fy curvature factor
-                (0.5, 2), # Fy cornering stiffness
-                (-2, 2),  # Fy horizontal shift
-                (-2, 2),  # Fy vertical shift
-                (0.5, 2), # Camber for Fy
-                (0.5, 2), # Camber stiffness Kygamma0
-                (0.5, 3), # Peak pneumatic trail
-                (0.5, 3), # Offset of Mz residual torque
-                (0.5, 3), # Vertical stiffness
-                (0.5, 3), # Camber for Mz
-                (0.5, 3), # Kappa influence on Fy
-                (0.5, 3), # Kappa induced Fy
-                (0.5, 3), # Moment arm of Fx
-                (0.5, 3), # Relaxation length of Fx
-                (0.5, 3), # Relaxation length of Fy
-                (0.5, 3), # Gyroscopic torque
-                (0.5, 3), # Overturning couple
-                (0.5, 3), # Mx vertical shift
-                (0.5, 3), # Rolling resistance torque
-                (0.5, 3), # Nominal inflation pressure
-                ],
+        shift_factors = ["LHX", "LVX", "LHY", "LVY", "LXAL", "LVMX"]
+        shape_factors = ["LCX", "LCY"]
+        curvature_factors = ["LEX", "LEY"]
+        bounds = []
+
+        for key in self.target_tire.scaling_coeffs:
+            if key in shift_factors:
+                bounds.append((-5, 5))
+            elif key in shape_factors:
+                bounds.append((0.5, 2))
+            elif key in curvature_factors:
+                bounds.append((0.5, 2))
+            else:
+                bounds.append((0.2, 5))
+
+        # gen_soln = basinhopping(
+        #     func = self._full_eval,
+        #     x0 = [1 for x in range(31)],
+        #     minimizer_kwargs={"method": "SLSQP"}
+        # ).x
+        gen_soln = minimize(
+            fun = self._full_eval,
+            x0 = [1 for x in range(31)],
+            bounds = bounds,
             method = "SLSQP",
             # method = "Nelder-Mead"
             ).x
@@ -320,42 +312,55 @@ class Analysis:
         residuals = []
 
         for FZ in self.FZ_sweep:
-            ref_mu_x = self.reference_tire.get_mu(FZ)[0]
-            iter_mu_x = self.target_tire.get_mu(FZ)[0]
+            if self.weighting[0] != 0:
+                ref_mu_x = self.reference_tire.get_mu(FZ)[0]
+                iter_mu_x = self.target_tire.get_mu(FZ)[0]
+                residuals.append((ref_mu_x - iter_mu_x) / ref_mu_x * 100 * self.weighting[0])
 
-            ref_mu_y = self.reference_tire.get_mu(FZ)[1]
-            iter_mu_y = self.target_tire.get_mu(FZ)[1]
+            if self.weighting[1] != 0:
+                ref_mu_y = self.reference_tire.get_mu(FZ)[1]
+                iter_mu_y = self.target_tire.get_mu(FZ)[1]
+                residuals.append((ref_mu_y - iter_mu_y) / ref_mu_y * 100 * self.weighting[1])
 
-            ref_C_y = self.reference_tire.get_cornering_stiffness(FZ, 0, 0.25)
-            iter_C_y = self.target_tire.get_cornering_stiffness(FZ, 0, 0.25)
+            if self.weighting[2] != 0:
+                ref_C_y = self.reference_tire.get_cornering_stiffness(FZ, 0, 0.25)
+                iter_C_y = self.target_tire.get_cornering_stiffness(FZ, 0, 0.25)
+                residuals.append((ref_C_y - iter_C_y) / ref_C_y * 100 * self.weighting[2])
 
-            ref_C_mz = self.reference_tire.get_aligning_stiffness(FZ, 0.001, 0.25)
-            iter_C_mz = self.target_tire.get_aligning_stiffness(FZ, 0.001, 0.25)
+            if self.weighting[3] != 0:
+                ref_C_mz = self.reference_tire.get_aligning_stiffness(FZ, 0.001, 0.25)
+                iter_C_mz = self.target_tire.get_aligning_stiffness(FZ, 0.001, 0.25)
+                residuals.append((ref_C_mz - iter_C_mz) / ref_C_mz * 100 * self.weighting[3])
 
-            ref_peak_Fy_alpha = self.reference_tire.get_peak_F_y_alpha(FZ)
-            iter_peak_Fy_alpha = self.target_tire.get_peak_F_y_alpha(FZ)
+            if self.weighting[4] != 0:
+                ref_peak_Fy_alpha = self.reference_tire.get_peak_F_y_alpha(FZ)
+                iter_peak_Fy_alpha = self.target_tire.get_peak_F_y_alpha(FZ)
+                residuals.append((ref_peak_Fy_alpha - iter_peak_Fy_alpha) / ref_peak_Fy_alpha * 100 * self.weighting[4])
+            
+            if self.weighting[5] != 0:
+                ref_slip_stiff = self.reference_tire.get_slip_stiffness(FZ)
+                iter_slip_stiff = self.target_tire.get_slip_stiffness(FZ)
+                residuals.append((ref_slip_stiff - iter_slip_stiff) / ref_slip_stiff * 100 * self.weighting[5])
 
-            ref_slip_stiff = self.reference_tire.get_slip_stiffness(FZ)
-            iter_slip_stiff = self.target_tire.get_slip_stiffness(FZ)
+            if self.weighting[6] != 0:
+                ref_peak_Mz_alpha = self.reference_tire.get_peak_M_z_alpha(FZ)
+                iter_peak_Mz_alpha = self.target_tire.get_peak_M_z_alpha(FZ)
+                residuals.append((ref_peak_Mz_alpha - iter_peak_Mz_alpha) / ref_peak_Mz_alpha * 100 * self.weighting[6])
 
-            ref_peak_Mz_alpha = self.reference_tire.get_peak_M_z_alpha(FZ)
-            iter_peak_Mz_alpha = self.target_tire.get_peak_M_z_alpha(FZ)
+            if self.weighting[7] != 0:
+                ref_peak_Fx_kappa = self.reference_tire.get_peak_F_x_kappa(FZ)
+                iter_peak_Fx_kappa = self.target_tire.get_peak_F_x_kappa(FZ)
+                residuals.append((ref_peak_Fx_kappa - iter_peak_Fx_kappa) / ref_peak_Fx_kappa * 100 * self.weighting[7])
 
-            ref_peak_Fx_kappa = self.reference_tire.get_peak_F_x_kappa(FZ)
-            iter_peak_Fx_kappa = self.target_tire.get_peak_F_x_kappa(FZ)
-
-            ref_C_gamma = self.reference_tire.get_camber_stiffness(FZ)
-            iter_C_gamma = self.target_tire.get_camber_stiffness(FZ)
-
-            # residuals.append((ref_mu_x - iter_mu_x) / ref_mu_x * 100 * self.weighting[0])
-            residuals.append((ref_mu_y - iter_mu_y) / ref_mu_y * 100 * self.weighting[1])
-            residuals.append((ref_C_y - iter_C_y) / ref_C_y * 100 * self.weighting[2])
-            residuals.append((ref_C_mz - iter_C_mz) / ref_C_mz * 100 * self.weighting[3])
-            residuals.append((ref_peak_Fy_alpha - iter_peak_Fy_alpha) / ref_peak_Fy_alpha * 100 * self.weighting[4])
-            # residuals.append((ref_slip_stiff - iter_slip_stiff) / ref_slip_stiff * 100 * self.weighting[5])
-            # residuals.append((ref_peak_Mz_alpha - iter_peak_Mz_alpha) / ref_peak_Mz_alpha * 100 * self.weighting[6])
-            # residuals.append((ref_peak_Fx_kappa - iter_peak_Fx_kappa) / ref_peak_Fx_kappa * 100 * self.weighting[7])
-            residuals.append((ref_C_gamma - iter_C_gamma) / ref_C_gamma * 100 * self.weighting[8])
+            if self.weighting[8] != 0:
+                ref_C_gamma = self.reference_tire.get_camber_stiffness(FZ)
+                iter_C_gamma = self.target_tire.get_camber_stiffness(FZ)
+                residuals.append((ref_C_gamma - iter_C_gamma) / ref_C_gamma * 100 * self.weighting[8])
+            
+            if self.weighting[9] != 0:
+                ref_pneu_trail = self.reference_tire.get_pneu_trail(FZ)
+                iter_pneu_trail = self.target_tire.get_pneu_trail(FZ)
+                residuals.append((ref_pneu_trail - iter_pneu_trail) / ref_pneu_trail * 100 * self.weighting[9])
         
         print(f"\rResidual Norm: {round(np.linalg.norm(residuals), 2)}          ", end = "")
         
