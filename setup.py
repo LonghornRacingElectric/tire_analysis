@@ -8,6 +8,7 @@ setup(name='LHR_tire_toolkit',
       author='Robert Horvath',
       author_email='rhorvath@utexas.edu',
       url='https://github.com/LonghornRacingElectric/tire_analysis',
-      py_modules=['LHR_tire_toolkit/process_tire']
+      packages=['tire_model']
+      py_modules=['LHR_tire_toolkit/process_tire', 'workflows.py']
       # packages=find_packages(exclude=("assets", "__pycache__",)),
      )
