@@ -1,5 +1,6 @@
 import numpy as np
 
+from tire_toolkit.assets.tire_model.MF52_calculations._longitudinal_force import get_F_x
 from tire_toolkit.assets.tire_model.MF52_calculations._lateral_force import get_F_y
 
 def get_M_z(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma):
@@ -187,7 +188,17 @@ def _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs,
     t_adj = D_t * np.cos(C_t * np.arctan(B_t * SA_t_eq - E_t * (B_t * SA_t_eq - np.arctan(B_t * SA_t_eq)))) * np.cos(alpha)
 
     # FX = self._combined_long([FZ, SA, SR, IA])
-    FX = 0
+    FX = get_F_x(
+        long_coeffs,
+        scaling_coeffs, 
+        vertical_coeffs,
+        dimensions,
+        operating_conditions,
+        FZ,
+        alpha,
+        kappa,
+        gamma)[1]
+    
     FY = get_F_y(
         lat_coeffs = lat_coeffs,
         scaling_coeffs = scaling_coeffs,
@@ -212,7 +223,7 @@ def _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs,
 
     return [t_adj, MZ_adj]
 
-def _pure_aligning(self, data: list[float]) -> float:
+def _pure_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma) -> float:
     
     # Pure aligning coeffs
     CMZ1 = aligning_coeffs["QBZ1"]
@@ -355,7 +366,18 @@ def _pure_aligning(self, data: list[float]) -> float:
     # Pneumatic trail
     t = D_t * np.cos(C_t * np.arctan(B_t * SA_t - E_t * (B_t * SA_t - np.arctan(B_t * SA_t)))) * np.cos(alpha)
 
-    M_Z0 = -t * F_y0 + M_zr
+    FY = get_F_y(
+        lat_coeffs = lat_coeffs,
+        scaling_coeffs = scaling_coeffs,
+        vertical_coeffs = vertical_coeffs,
+        dimensions = dimensions,
+        operating_conditions = operating_conditions,
+        FZ = FZ,
+        alpha = alpha,
+        kappa = kappa,
+        gamma = gamma)[1]
+    
+    M_Z0 = -t * FY + M_zr
     M_Z = M_Z0
 
     return M_Z
