@@ -1,0 +1,10 @@
+setuptools
+wheel
+numpy
+matplotlib
+pyQt5
+pandas
+scipy
+pygit
+pyyaml
+./tire_toolkit
