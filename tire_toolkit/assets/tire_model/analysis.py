@@ -8,7 +8,7 @@ import time
 from scipy.optimize import basinhopping
 from scipy.optimize import minimize
 
-from .MF52 import MF52
+from tire_toolkit.assets.tire_model.MF52 import MF52
 
 class Analysis:
     def __init__(self, num: int, name: list[str], path: list[str]) -> None:
