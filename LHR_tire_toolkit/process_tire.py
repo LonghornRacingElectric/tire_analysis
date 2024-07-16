@@ -1,4 +1,4 @@
-import workflows
+import LHR_tire_toolkit.workflows as workflows
 from tire_model.analysis import Analysis
 
 class ProcessTire:
