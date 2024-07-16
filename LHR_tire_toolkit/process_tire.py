@@ -1,5 +1,5 @@
-from tire_toolkit import workflows
-from tire_toolkit.assets.tire_model.analysis import Analysis
+import workflows
+from tire_model.analysis import Analysis
 
 class ProcessTire:
     """
