@@ -1,5 +1,18 @@
+<<<<<<< HEAD
 matplotlib
 numpy
 setuptools
 scipy
 pandas
+=======
+setuptools
+wheel
+numpy
+matplotlib
+pyQt5
+pandas
+scipy
+pygit
+pyyaml
+./tire_toolkit
+>>>>>>> d7b826e54b7897b448004789bf958ef09b92155d
