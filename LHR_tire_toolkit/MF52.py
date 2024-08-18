@@ -70,6 +70,7 @@ class MF52:
             Slip ratio (unitless)
         gamma : float
             Inclination angle in radians
+            
         Returns
         -------
         list[float]
