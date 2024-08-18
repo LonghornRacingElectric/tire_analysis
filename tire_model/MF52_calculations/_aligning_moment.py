@@ -1,7 +1,7 @@
 import numpy as np
 
-from LHR_tire_toolkit.tire_model.MF52_calculations._longitudinal_force import get_F_x
-from LHR_tire_toolkit.tire_model.MF52_calculations._lateral_force import get_F_y
+from tire_model.MF52_calculations._longitudinal_force import get_F_x
+from tire_model.MF52_calculations._lateral_force import get_F_y
 
 def get_M_z(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma):
     
