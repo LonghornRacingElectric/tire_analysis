@@ -74,7 +74,7 @@ class MF52:
         Returns
         -------
         list[float]
-            _description_
+            Tire forces and moments in the form: [F_x, F_y, F_z, M_x, M_y, M_z]
         """
         mu_x, F_x_result = get_F_x(
             long_coeffs = self._long_coeffs,
