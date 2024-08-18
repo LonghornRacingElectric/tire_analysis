@@ -9,6 +9,6 @@ setup(name='LHR_tire_toolkit',
       author_email='rhorvath@utexas.edu',
       url='https://github.com/LonghornRacingElectric/tire_analysis',
       packages=['tire_model', 'tire_model/file_processing', 'tire_model/MF52_calculations'],
-      py_modules=['LHR_tire_toolkit/process_tire', 'LHR_tire_toolkit/workflows']
+      py_modules=['tire_model/MF52']
       # packages=find_packages(exclude=("assets", "__pycache__",)),
      )
