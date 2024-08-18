@@ -4,13 +4,13 @@ from scipy.optimize import minimize
 import pandas as pd
 from mpl_toolkits.mplot3d import Axes3D
 
-from tire_model.file_processing._process_tir import _Processor
+from LHR_tire_toolkit.file_processing._process_tir import _Processor
 
-from tire_model.MF52_calculations._longitudinal_force import get_F_x
-from tire_model.MF52_calculations._lateral_force import get_F_y
-from tire_model.MF52_calculations._overturning_moment import get_M_x
-from tire_model.MF52_calculations._rolling_resistance import get_M_y
-from tire_model.MF52_calculations._aligning_moment import get_M_z
+from LHR_tire_toolkit.MF52_calculations._longitudinal_force import get_F_x
+from LHR_tire_toolkit.MF52_calculations._lateral_force import get_F_y
+from LHR_tire_toolkit.MF52_calculations._overturning_moment import get_M_x
+from LHR_tire_toolkit.MF52_calculations._rolling_resistance import get_M_y
+from LHR_tire_toolkit.MF52_calculations._aligning_moment import get_M_z
 
 
 class MF52:
