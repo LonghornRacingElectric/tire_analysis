@@ -8,7 +8,7 @@ setup(name='LHR_tire_toolkit',
       author='Robert Horvath',
       author_email='rhorvath@utexas.edu',
       url='https://github.com/LonghornRacingElectric/tire_analysis/tree/LHR_tire_toolkit_package',
-      packages=['LHR_tire_toolkit', 'tire_model'],
+      packages=['LHR_tire_toolkit', 'tire_model/file_processing', 'tire_model/MF52_calculations'],
       py_modules=['LHR_tire_toolkit/MF52'],
       install_requires=[
           'numpy',
