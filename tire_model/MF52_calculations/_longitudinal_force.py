@@ -9,7 +9,7 @@ def get_F_x(long_coeffs, scaling_coeffs, vertical_coeffs, FZ, alpha, kappa, gamm
 
 def _combined_long(long_coeffs, scaling_coeffs, vertical_coeffs, FZ, alpha, kappa, gamma) -> float:
 
-    if alpha != 0:
+    if np.array(alpha).any() != 0:
         # Combined long coeffs
         RBX1 = long_coeffs["RBX1"]
         RBX2 = long_coeffs["RBX2"]

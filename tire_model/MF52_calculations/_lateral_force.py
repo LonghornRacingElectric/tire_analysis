@@ -8,7 +8,7 @@ def get_F_y(lat_coeffs, scaling_coeffs, vertical_coeffs, FZ, alpha, kappa, gamma
 
 def _combined_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, FZ, alpha, kappa, gamma) -> float:
 
-    if kappa != 0:
+    if np.array(kappa).any() != 0:
         # Combined lat coeffs
         RBY1 = lat_coeffs["RBY1"]
         RBY2 = lat_coeffs["RBY2"]
@@ -34,7 +34,7 @@ def _combined_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, FZ, alpha, kappa,
         FNOMIN = vertical_coeffs["FNOMIN"]
 
         # Pure slip conditions
-        mu_y, FY_0 = _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, FZ, kappa, gamma)
+        mu_y, FY_0 = _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, FZ, alpha, gamma)
         
         df_z = (FZ - FNOMIN * LFZO) / (FNOMIN * LFZO)
 
