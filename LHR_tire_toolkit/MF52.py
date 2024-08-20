@@ -1,8 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.optimize import minimize
-import pandas as pd
-from mpl_toolkits.mplot3d import Axes3D
 
 from tire_model.file_processing._process_tir import _Processor
 
@@ -14,18 +11,6 @@ from tire_model.MF52_calculations._aligning_moment import get_M_z
 
 
 class MF52:
-    """
-    ## MF52
-
-    Pacejka Magic Formula 5.2 tire model
-
-    Parameters
-    ----------
-    tire_name : str
-        Name of tire for internal use
-    file_path : str
-        File path to .tir file
-    """
     def __init__(self, tire_name: str, file_path: str) -> None:
         self.tire_name = tire_name
         self._tire_params = _Processor(name = tire_name, file_path = file_path)
@@ -55,33 +40,11 @@ class MF52:
         self.C_mz = self.get_aligning_stiffness(FZ, 0, 0.25)
 
     def tire_eval(self, FZ: float, alpha: float, kappa: float, gamma: float) -> list[float]:
-        """
-        ## Tire Evaluation
-
-        Evaluates tire forces and moments at a given FZ, alpha, kappa, and gamma
-
-        Parameters
-        ----------
-        FZ : float
-            Normal load in Newtons
-        alpha : float
-            Slip angle in radians
-        kappa : float
-            Slip ratio (unitless)
-        gamma : float
-            Inclination angle in radians
-            
-        Returns
-        -------
-        list[float]
-            Tire forces and moments in the form: [F_x, F_y, F_z, M_x, M_y, M_z]
-        """
+        
         mu_x, F_x_result = get_F_x(
             long_coeffs = self._long_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
@@ -92,8 +55,6 @@ class MF52:
             lat_coeffs = self._lat_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
@@ -105,10 +66,7 @@ class MF52:
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
             dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
             FZ = FZ,
-            alpha = alpha,
-            kappa = kappa,
             gamma = gamma,
             Fy = F_y_result
         )
@@ -118,22 +76,17 @@ class MF52:
             long_coeffs = self._long_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
-            FZ = FZ,
-            alpha = alpha,
-            kappa = kappa,
-            gamma = gamma
+            dimensions = self._dimensions, 
+            FZ = FZ
         )
 
-        self.pneu_trail, MZ_result = get_M_z(
+        self.pneu_lat_trail, self.pneu_trail, MZ_result = get_M_z(
             aligning_coeffs = self._aligning_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             lat_coeffs = self._lat_coeffs,
             long_coeffs = self._long_coeffs,
             vertical_coeffs = self._vertical_coeffs,
             dimensions = self._dimensions,
-            operating_conditions = self._operating_conds,
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
@@ -244,8 +197,6 @@ class MF52:
             long_coeffs = self._long_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
@@ -255,9 +206,7 @@ class MF52:
         mu_y_result, F_y_result = get_F_y(
             lat_coeffs = self._lat_coeffs,
             scaling_coeffs = self.scaling_coeffs,
-            vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
+            vertical_coeffs = self._vertical_coeffs, 
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
