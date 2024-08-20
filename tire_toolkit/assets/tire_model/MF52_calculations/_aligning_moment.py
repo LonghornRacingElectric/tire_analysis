@@ -11,7 +11,7 @@ def get_M_z(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_c
 
 def _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, FZ, alpha, kappa, gamma):
     
-    if kappa != 0:
+    if np.array(kappa).any() != 0:
         # Pure aligning coeffs
         QBZ1 = aligning_coeffs["QBZ1"]
         QBZ2 = aligning_coeffs["QBZ2"]
