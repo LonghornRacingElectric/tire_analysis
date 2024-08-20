@@ -263,7 +263,7 @@ class Analysis:
 
         print("\n\nSolver Converged |", end = " ")
 
-        print(f"Elapsted Time: {round(end - start)} seconds, Residual Norm: {self.resid_norm}\n")
+        print(f"Elapsed Time: {round(end - start)} seconds, Residual Norm: {self.resid_norm}\n")
 
         scaling_coeffs = [*gen_soln, *rel_len_soln, vert_stiff_soln]
 

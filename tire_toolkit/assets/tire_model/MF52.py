@@ -140,7 +140,7 @@ class MF52:
             return list(alpha_sweep)[list(FY).index(min(FY))]
 
         else:
-            alpha = minimize(lambda x: self.tire_eval(FZ = FZ, alpha = x[0] * np.pi / 180, kappa = 0, gamma = 0)[1], x0 = [7], bounds = [(0, 90)], method = "SLSQP").x
+            alpha = minimize(lambda x: -1 * self.tire_eval(FZ = FZ, alpha = x[0] * np.pi / 180, kappa = 0, gamma = 0)[1], x0 = [7], bounds = [(0, 90)], method = "SLSQP").x
 
             return alpha[0]
 
@@ -153,7 +153,7 @@ class MF52:
             return list(alpha_sweep)[list(MZ).index(min(MZ))]
 
         else:
-            alpha = minimize(lambda x: -1 * self.tire_eval(FZ = FZ, alpha = x[0] * np.pi / 180, kappa = 0, gamma = 0)[5], x0 = [2], bounds = [(0, 90)], method = "SLSQP").x
+            alpha = minimize(lambda x: self.tire_eval(FZ = FZ, alpha = x[0] * np.pi / 180, kappa = 0, gamma = 0)[5], x0 = [2], bounds = [(0, 90)], method = "SLSQP").x
 
             return alpha[0]
 

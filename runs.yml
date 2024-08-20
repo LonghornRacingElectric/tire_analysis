@@ -10,7 +10,7 @@ Tires:
     # "Hoosier_R25B_16x7p5_10_on_7in",
   ]
   .tir File Paths: [
-    "./tir_files/Round_8_Hoosier_R25B_16x7p5_10_on_7in_12psi_PAC02_UM2.tir",
+    "./tir_files/Modified_Round_8_Hoosier_R25B_16x7p5_10_on_7in_12psi_PAC02_UM2.tir",
     # "./tire_toolkit/assets/tir_files/Round_8_Hoosier_R25B_16x6_10_on_7in_12psi_PAC02_UM2.tir",
     # "./tire_toolkit/assets/tir_files/Round_6_Hoosier_R25B_18x6_10_on_7in_12psi_PAC02_UM4.tir",
     # "./tire_toolkit/assets/tir_files/Round_6_Hoosier_R25B_18x6_10_on_7in_12psi_PAC02_UM4.tir"
