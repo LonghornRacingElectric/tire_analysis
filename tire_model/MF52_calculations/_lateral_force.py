@@ -98,7 +98,7 @@ def _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, FZ, alpha, gamma) -> 
     # Vertical coeffs
     FNOMIN = vertical_coeffs["FNOMIN"]
     
-    IA_y = gamma * LGAY
+    IA_y = gamma * LGAY * np.sign(PDY1)
     df_z = (FZ - FNOMIN * LFZO) / (FNOMIN * LFZO)
     mu_y = (PDY1 + PDY2 * df_z) * (1 - PDY3 * IA_y**2) * LMUY
 
@@ -106,7 +106,7 @@ def _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, FZ, alpha, gamma) -> 
     D_y = mu_y * FZ
     K_y = PKY1 * FNOMIN * np.sin(2 * np.arctan(FZ / (PKY2 * FNOMIN * LFZO))) * \
         (1 - PKY3 * abs(IA_y)) * LFZO * LKY
-    B_y = K_y / (C_y * D_y)
+    B_y = K_y / (C_y * D_y) * np.sign(PDY1)
 
     S_Hy = (PHY1 + PHY2 * df_z) * LHY + PHY3 * IA_y
     S_Vy = FZ * ((PVY1 + PVY2 * df_z) * LVY + (PVY3 + PVY4 * df_z) * IA_y) * LMUY
