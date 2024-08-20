@@ -97,7 +97,7 @@ def _pure_long(long_coeffs, scaling_coeffs, vertical_coeffs, FZ, kappa, gamma) -
 
     E_x = (PEX1 + PEX2 * df_z + PEX3 * df_z**2) * (1 - PEX4 * np.sign(SR_x)) * LEX
 
-    assert E_x <= 1, f"E_x doesn't meet requirements of <= 1 | Curent value: {E_x}"
+    assert np.array(E_x).any() <= 1, f"E_x doesn't meet requirements of <= 1 | Curent value: {E_x}"
     
     F_X0 = D_x * np.sin(C_x * np.arctan(B_x * SR_x - E_x * (B_x * SR_x - np.arctan(B_x * SR_x)))) + S_Vx
     F_X = F_X0
