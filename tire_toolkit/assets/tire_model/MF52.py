@@ -48,8 +48,6 @@ class MF52:
             long_coeffs = self._long_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
@@ -60,8 +58,6 @@ class MF52:
             lat_coeffs = self._lat_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
@@ -73,10 +69,7 @@ class MF52:
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
             dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
             FZ = FZ,
-            alpha = alpha,
-            kappa = kappa,
             gamma = gamma,
             Fy = F_y_result
         )
@@ -86,22 +79,17 @@ class MF52:
             long_coeffs = self._long_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
-            FZ = FZ,
-            alpha = alpha,
-            kappa = kappa,
-            gamma = gamma
+            dimensions = self._dimensions, 
+            FZ = FZ
         )
 
-        self.pneu_trail, MZ_result = get_M_z(
+        self.pneu_lat_trail, self.pneu_trail, MZ_result = get_M_z(
             aligning_coeffs = self._aligning_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             lat_coeffs = self._lat_coeffs,
             long_coeffs = self._long_coeffs,
             vertical_coeffs = self._vertical_coeffs,
             dimensions = self._dimensions,
-            operating_conditions = self._operating_conds,
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
@@ -212,8 +200,6 @@ class MF52:
             long_coeffs = self._long_coeffs,
             scaling_coeffs = self.scaling_coeffs,
             vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
@@ -223,9 +209,7 @@ class MF52:
         mu_y_result, F_y_result = get_F_y(
             lat_coeffs = self._lat_coeffs,
             scaling_coeffs = self.scaling_coeffs,
-            vertical_coeffs = self._vertical_coeffs,
-            dimensions = self._dimensions,
-            operating_conditions = self._operating_conds, 
+            vertical_coeffs = self._vertical_coeffs, 
             FZ = FZ,
             alpha = alpha,
             kappa = kappa,
