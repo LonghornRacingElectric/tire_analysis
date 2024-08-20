@@ -114,7 +114,7 @@ def _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, FZ, alpha, gamma) -> 
 
     E_y = (PEY1 + PEY2 * df_z) * (1 - (PEY3 + PEY4 * IA_y) * np.sign(SA_y)) * LEY
 
-    assert E_y <= 1, f"E_y doesn't meet requirements of <= 1 | Curent value: {E_y}"
+    assert np.array(E_y).any() <= 1, f"E_y doesn't meet requirements of <= 1 | Curent value: {E_y}"
 
     F_Y0 = D_y * np.sin(C_y * np.arctan(B_y * SA_y - E_y * (B_y * SA_y - np.arctan(B_y * SA_y)))) + S_Vy
     F_Y = F_Y0

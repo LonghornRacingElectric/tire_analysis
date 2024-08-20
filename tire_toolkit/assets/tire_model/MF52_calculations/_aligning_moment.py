@@ -263,7 +263,7 @@ def _pure_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, vertical_coeffs,
 
     E_t = (QEZ1 + QEZ2 * df_z + QEZ3 * df_z**2) * (1 + (QEZ4 + QEZ5 * IA_z) * (2 / np.pi) * np.arctan(B_t * C_t * SA_t))
 
-    assert E_t <= 1, f"E_t doesn't meet requirements of <= 1 | Curent value: {E_t}"
+    assert np.array(E_t).any() <= 1, f"E_t doesn't meet requirements of <= 1 | Curent value: {E_t}"
     
     # Residual Torque
 
