@@ -40,6 +40,9 @@ class MF52:
         self.C_mz = self.get_aligning_stiffness(FZ, 0, 0.25)
 
     def tire_eval(self, FZ: float, alpha: float, kappa: float, gamma: float) -> list[float]:
+
+        if FZ < 0:
+            return [0, 0, 0, 0, 0, 0]
         
         mu_x, F_x_result = get_F_x(
             long_coeffs = self._long_coeffs,
