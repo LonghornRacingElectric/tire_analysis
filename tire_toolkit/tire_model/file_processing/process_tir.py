@@ -1,19 +1,74 @@
-class _Processor:
+from typing import Sequence, Tuple
+
+
+class Processor:
+    """
+    ## Processor
+
+    Processes .tir files
+
+    Parameters
+    ----------
+    name : str
+        Internal name of processed result (.tir values)
+    file_path : str
+        Path to desired .tir file
+    """
     def __init__(self, name: str, file_path: str) -> None:
         self._tire = None
         self._exclude = ["$", "!"]
+        self.file_path = file_path
 
-        self._add_tire(name, file_path)
+        self._add_tire(name)
 
-    def _add_tire(self, name: str, path: str) -> None:
-        self._tire = [name, self._import_data(path)]
+    def _add_tire(self, name: str) -> None:
+        """
+        ## Add Tire
+
+        Stores desired tire locally
+
+        Parameters
+        ----------
+        name : str
+            Internal name of processed result
+        """
+        self._tire = [name, self._import_data()]
     
     def get_parameters(self, parameter: str) -> dict:
+        """
+        ## Get Parameter
+
+        Displays desired parameter from tire properties
+
+        Parameters
+        ----------
+        parameter : str
+            Parameter to display
+
+        Returns
+        -------
+        dict
+            Dictionary of (key, value) pairs for desired parameter
+        """
         return self._tire[1][parameter]
 
-    def _import_data(self, path: str) -> list[str, list]:
+    def _import_data(self) -> Sequence[Tuple[str, list]]:
+        """
+        ## Import Data
+
+        Parses .tir file and stores parameters
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Sequence[Sequence[str, list]]
+            Sequence containing .tir headers and corresponding (parameter, value) pairs
+        """
         local_results = {}
-        f = open(path, "r")
+        f = open(self.file_path, "r")
 
         data_entry = False
 

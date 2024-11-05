@@ -1,12 +1,12 @@
 import numpy as np
 
-def get_F_y(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma):
+def get_Fy(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma):
     
-    combined_lat = _combined_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma)
+    combined_lat = _combined_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma)
 
     return combined_lat
 
-def _combined_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma) -> float:
+def _combined_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma) -> float:
 
     # Pure lat coeffs
     CFY1 = lat_coeffs["PCY1"]
@@ -83,7 +83,7 @@ def _combined_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, opera
     # Dimension coeffs
     R0 = dimensions["UNLOADED_RADIUS"]
     
-    df_z = (FZ - FNOMIN * LFZO) / (FNOMIN * LFZO)
+    df_z = (Fz - FNOMIN * LFZO) / (FNOMIN * LFZO)
     IA_y = gamma * LGAY
     mu_y = (CFY2 + CFY3 * df_z) * (1 - CFY4 * IA_y**2) * LMUY
 
@@ -92,7 +92,7 @@ def _combined_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, opera
     E_ySR = CCFY5 + CCFY6 * df_z
     S_HySR = CCFY7 + CCFY8 * df_z
 
-    D_VySR = mu_y * FZ * (CCFY9 + CCFY10 * df_z + CCFY11 * gamma) * np.cos(np.arctan(CCFY12 * alpha))
+    D_VySR = mu_y * Fz * (CCFY9 + CCFY10 * df_z + CCFY11 * gamma) * np.cos(np.arctan(CCFY12 * alpha))
 
     S_VySR = D_VySR * np.sin(CCFY13 * np.arctan(CCFY14 * kappa)) * LVYKA
 
@@ -104,13 +104,13 @@ def _combined_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, opera
 
     # This is the same calculation, but the variables are shown a more intuitive way
     G_ySR = (np.cos(C_ySR * np.arctan(B_ySR * SR_s - E_ySR * (B_ySR * SR_s - np.arctan(B_ySR * SR_s))))) / (np.cos(C_ySR * np.arctan(B_ySR * S_HySR - E_ySR * (B_ySR * S_HySR - np.arctan(B_ySR * S_HySR)))))
-    FY_0 = _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma)
+    FY_0 = _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma)
 
     FY_adj = FY_0 * G_ySR + S_VySR
 
-    return [abs(mu_y), FY_adj]
+    return [mu_y, FY_adj]
 
-def _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma) -> float:
+def _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma) -> float:
     # Pure lat coeffs
     CFY1 = lat_coeffs["PCY1"]
     CFY2 = lat_coeffs["PDY1"]
@@ -171,17 +171,17 @@ def _pure_lat(lat_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating
     R0 = dimensions["UNLOADED_RADIUS"]
     
     IA_y = gamma * LGAY
-    df_z = (FZ - FNOMIN * LFZO) / (FNOMIN * LFZO)
+    df_z = (Fz - FNOMIN * LFZO) / (FNOMIN * LFZO)
     mu_y = (CFY2 + CFY3 * df_z) * (1 - CFY4 * IA_y**2) * LMUY
 
     C_y = CFY1 * LCY
-    D_y = mu_y * FZ
-    K_y = CFY9 * FNOMIN * np.sin(2 * np.arctan(FZ / (CFY10 * FNOMIN * LFZO))) * \
+    D_y = mu_y * Fz
+    K_y = CFY9 * FNOMIN * np.sin(2 * np.arctan(Fz / (CFY10 * FNOMIN * LFZO))) * \
         (1 - CFY11 * abs(IA_y)) * LFZO * LKY
     B_y = K_y / (C_y * D_y)
 
     S_Hy = (CFY12 + CFY13 * df_z) * LHY + CFY14 * IA_y
-    S_Vy = FZ * ((CFY15 + CFY16 * df_z) * LVY + (CFY17 + CFY18 * df_z) * IA_y) * LMUY
+    S_Vy = Fz * ((CFY15 + CFY16 * df_z) * LVY + (CFY17 + CFY18 * df_z) * IA_y) * LMUY
     SA_y = alpha + S_Hy
 
     E_y = (CFY5 + CFY6 * df_z) * (1 - (CFY7 + CFY8 * IA_y) * np.sign(SA_y)) * LEY

@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_M_y(rolling_coeffs, long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma):
+def get_My(rolling_coeffs, long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma):
 
     # Rolling resistance coeffs
     QSY1 = rolling_coeffs["QSY1"]
@@ -73,16 +73,16 @@ def get_M_y(rolling_coeffs, long_coeffs, scaling_coeffs, vertical_coeffs, dimens
     R0 = dimensions["UNLOADED_RADIUS"]
 
     IA_x = gamma * LGAX
-    df_z = (FZ - FNOMIN * LFZO) / (FNOMIN * LFZO)
+    df_z = (Fz - FNOMIN * LFZO) / (FNOMIN * LFZO)
     mu_x = (CFX2 + CFX3 * df_z) * (1 - CFX4 * IA_x**2) * LMUX
 
     C_x = CFX1 * LCX
-    D_x = mu_x * FZ
-    K_x = FZ * (CFX9 + CFX10 * df_z) * np.exp(CFX11 * df_z) * LKX
+    D_x = mu_x * Fz
+    K_x = Fz * (CFX9 + CFX10 * df_z) * np.exp(CFX11 * df_z) * LKX
     B_x = K_x / (C_x * D_x)
 
     S_Hx = (CFX12 + CFX13 * df_z) * LHX
-    S_Vx = FZ * (CFX14 + CFX15 * df_z) * LVX * LMUX
+    S_Vx = Fz * (CFX14 + CFX15 * df_z) * LVX * LMUX
 
     M_y = R0 * (S_Vx + K_x * S_Hx)
 

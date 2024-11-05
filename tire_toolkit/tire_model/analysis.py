@@ -7,8 +7,9 @@ import time
 
 from scipy.optimize import basinhopping
 from scipy.optimize import minimize
+from typing import Sequence
 
-from tire_toolkit.assets.tire_model.MF52 import MF52
+from tire_toolkit.tire_model.MF52 import MF52
 
 class Analysis:
     def __init__(self, num: int, name: list[str], path: list[str]) -> None:
@@ -16,7 +17,7 @@ class Analysis:
         self.names = name
         self.paths = path
 
-        self._tire_lst = []
+        self._tire_lst: Sequence[MF52] | list = []
         self._import_tires()
 
     def _import_tires(self) -> None:
@@ -30,12 +31,12 @@ class Analysis:
 
     def comparison_plot(self, tire_names: list[str], FZ_min: float, FZ_max: float) -> matplotlib.figure.Figure:
 
-        selected_tires = []
+        selected_tires: Sequence[MF52] = []
 
         for name in tire_names:
             selected_tires.append(self._tire_lst[self.names.index(name)])
 
-        FZ_sweep = np.linspace(FZ_min, FZ_max, 1000)
+        Fz_sweep = np.linspace(FZ_min, FZ_max, 1000)
 
         fig, axes = plt.subplots(2, 3)
         fig2, axes2 = plt.subplots(2, 3)
@@ -121,7 +122,11 @@ class Analysis:
         axes2[1, 1].set_ylabel("Camber Stiffness (N/deg)")
         axes2[1, 1].grid()
 
-        fig2.delaxes(axes2[1, 2])
+        # Peak Fy vs Gamma
+        axes2[1, 2].set_title("Gamma at Peak Fy vs Fz", pad = 10)
+        axes2[1, 2].set_xlabel("FZ (N)")
+        axes2[1, 2].set_ylabel("Gamma (deg)")
+        axes2[1, 2].grid()
         
         for tire in selected_tires:
 
@@ -136,57 +141,95 @@ class Analysis:
             peak_Fy_alpha = []
             peak_Mz_alpha = []
             peak_Fx_kappa = []
+            max_Fy_gamma = []
+            peak_Fy_with_gamma = []
 
-            for FZ in FZ_sweep:
-                mu_x.append(tire.get_mu(FZ)[0])
-                mu_y.append(tire.get_mu(FZ)[1])
+            for Fz in Fz_sweep:
+                mu_x.append(tire.get_mu(Fz=Fz)[0])
+                mu_y.append(tire.get_mu(Fz=Fz)[1])
 
-                C_alpha.append(tire.get_cornering_stiffness(FZ, 0, 0.25))
-                C_kappa.append(tire.get_slip_stiffness(FZ))
-                C_mz.append(tire.get_aligning_stiffness(FZ, 0, 0.25))
-                pneu_trail.append(tire.get_pneu_trail(FZ) * 1000)
-                C_gamma.append(tire.get_camber_stiffness(FZ, 0, 0.25))
-                rel_len.append(tire.get_cornering_stiffness(FZ, 0, 0.25) / tire.get_lateral_stiffness() * 180 / np.pi)
-                peak_Fy_alpha.append(tire.get_peak_F_y_alpha(FZ, approx = False))
-                peak_Mz_alpha.append(tire.get_peak_M_z_alpha(FZ, approx = False))
-                peak_Fx_kappa.append(tire.get_peak_F_x_kappa(FZ, approx = False))
+                C_alpha.append(tire.get_cornering_stiffness(Fz=Fz, dx=0.25))
+                C_kappa.append(tire.get_slip_stiffness(Fz=Fz))
+                C_mz.append(tire.get_aligning_stiffness(Fz=Fz, dx=0.25))
+                pneu_trail.append(tire.get_pneu_trail(Fz=Fz) * 1000)
+                C_gamma.append(tire.get_camber_stiffness(Fz=Fz, dx=0.25))
+                rel_len.append(tire.get_cornering_stiffness(Fz=Fz, dx=0.25) / tire.lateral_stiffness * 180 / np.pi)
+                peak_Fy_alpha.append(tire.get_peak_F_y_alpha(Fz=Fz, approx = False))
+                peak_Mz_alpha.append(tire.get_peak_M_z_alpha(Fz=Fz, approx = False))
+                peak_Fx_kappa.append(tire.get_peak_F_x_kappa(Fz=Fz, approx = False))
+                max_Fy_gamma_val, peak_Fy_with_gamma_val = tire.get_F_y_at_gamma(Fz=Fz, approx = False)
+                max_Fy_gamma.append(max_Fy_gamma_val)
+                peak_Fy_with_gamma.append(peak_Fy_with_gamma_val)
 
             ### Page 1
 
             # Long Friction Coefficient
-            axes[0, 0].plot(FZ_sweep, mu_x)
+            axes[0, 0].plot(Fz_sweep, mu_x)
 
             # Lat Friction Coefficient
-            axes[0, 1].plot(FZ_sweep, mu_y)
+            axes[0, 1].plot(Fz_sweep, mu_y)
 
             # Cornering Stiffness
-            axes[0, 2].plot(FZ_sweep, C_alpha)
+            axes[0, 2].plot(Fz_sweep, C_alpha)
 
             # Aligning Moment Stiffness
-            axes[1, 0].plot(FZ_sweep, C_mz)
+            axes[1, 0].plot(Fz_sweep, C_mz)
 
             # Relaxation Length
-            axes[1, 1].plot(FZ_sweep, rel_len)
+            axes[1, 1].plot(Fz_sweep, rel_len)
 
             # Pneumatic Trail
-            axes[1, 2].plot(FZ_sweep, pneu_trail)
+            axes[1, 2].plot(Fz_sweep, pneu_trail)
 
             ### Page 2
 
             # Peak Fy Slip Angle
-            axes2[0, 0].plot(FZ_sweep, peak_Fy_alpha)
+            axes2[0, 0].plot(Fz_sweep, np.array(peak_Fy_alpha) * 180 / np.pi)
 
             # Peak Mz Slip Angle
-            axes2[0, 1].plot(FZ_sweep, peak_Mz_alpha)
+            axes2[0, 1].plot(Fz_sweep, np.array(peak_Mz_alpha) * 180 / np.pi)
 
             # Peak Fx Slip Ratio
-            axes2[0, 2].plot(FZ_sweep, peak_Fx_kappa)
+            axes2[0, 2].plot(Fz_sweep, peak_Fx_kappa)
 
             # Slip Stiffness
-            axes2[1, 0].plot(FZ_sweep, C_kappa)
+            axes2[1, 0].plot(Fz_sweep, C_kappa)
 
             # Camber Stiffness
-            axes2[1, 1].plot(FZ_sweep, C_gamma)
+            axes2[1, 1].plot(Fz_sweep, C_gamma)
+
+            # Gamma conditions
+            axes2[1, 2].plot(Fz_sweep, max_Fy_gamma)
+        
+        new_fig = plt.figure()
+        new_ax = new_fig.gca()
+
+        new_ax.plot(Fz_sweep, max_Fy_gamma)
+        new_ax.set_xlabel("Fz (N)")
+        new_ax.set_ylabel("Gamma for Peak Fy (deg)")
+        new_ax.set_title("Gamma vs Fz")
+        new_ax.grid()
+
+        new_fig_2 = plt.figure()
+        new_ax_2 = new_fig_2.gca()
+
+        new_ax_2.plot(Fz_sweep, peak_Fy_alpha)
+        new_ax_2.set_xlabel("Fz (N)")
+        new_ax_2.set_ylabel("Alpha at Peak Fy (deg)")
+        new_ax_2.set_title("Alpha at Peak Fy vs Fz")
+        new_ax_2.grid()
+
+        new_fig_3 = plt.figure()
+        new_ax_3 = new_fig_3.gca()
+
+        new_ax_3.plot(Fz_sweep, peak_Fy_with_gamma)
+        new_ax_3.set_xlabel("Fz (N)")
+        new_ax_3.set_ylabel("Fy (N)")
+        new_ax_3.set_title("Maximum Fy vs Fz")
+        new_ax_3.grid()
+
+        plt.show()
+
 
         fig.legend(tire_names, fontsize = "8", bbox_to_anchor = (1, 1))
         fig2.legend(tire_names, fontsize = "8", bbox_to_anchor = (1, 1))
@@ -206,7 +249,7 @@ class Analysis:
 
         original_coeffs = list(self.target_tire.scaling_coeffs.values()) + [self.reference_tire.structural["LATERAL_STIFFNESS"]]
 
-        self.FZ_sweep = np.linspace(FZ_min, FZ_max, mesh)
+        self.Fz_sweep = np.linspace(FZ_min, FZ_max, mesh)
 
         self.mesh = mesh
         self.previous_residual_norm = None
@@ -311,7 +354,7 @@ class Analysis:
         
         residuals = []
 
-        for FZ in self.FZ_sweep:
+        for FZ in self.Fz_sweep:
             if self.weighting[0] != 0:
                 ref_mu_x = self.reference_tire.get_mu(FZ)[0]
                 iter_mu_x = self.target_tire.get_mu(FZ)[0]
@@ -383,7 +426,7 @@ class Analysis:
 
         residuals = []
 
-        for FZ in self.FZ_sweep:
+        for FZ in self.Fz_sweep:
             lat_stiff = self.target_tire.structural["LATERAL_STIFFNESS"]
 
             lat_stiff *= scale[0]

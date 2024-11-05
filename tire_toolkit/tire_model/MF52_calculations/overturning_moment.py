@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_M_x(overturning_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma, Fy) -> float:
+def get_Mx(overturning_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma, Fy) -> float:
 
     # Overturning moment coeffs
     QSX1 = overturning_coeffs["QSX1"]
@@ -46,6 +46,6 @@ def get_M_x(overturning_coeffs, scaling_coeffs, vertical_coeffs, dimensions, ope
     # Dimension coeffs
     R0 = dimensions["UNLOADED_RADIUS"]
 
-    M_x = R0 * FZ * (QSX1 * LVMX + (-1 * QSX2 * gamma + QSX3 * Fy / FNOMIN) * LMX)
+    M_x = R0 * Fz * (QSX1 * LVMX + (-1 * QSX2 * gamma + QSX3 * Fy / FNOMIN) * LMX)
 
     return M_x

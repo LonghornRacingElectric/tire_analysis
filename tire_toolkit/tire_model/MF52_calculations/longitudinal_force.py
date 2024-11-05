@@ -2,12 +2,12 @@ import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
 
-def get_F_x(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma):
-    combined_long = _combined_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma)
+def get_Fx(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma):
+    combined_long = _combined_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma)
 
     return combined_long
 
-def _combined_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma) -> float:
+def _combined_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma) -> float:
 
     # Pure long coeffs
     CFX1 = long_coeffs["PCX1"]
@@ -73,7 +73,7 @@ def _combined_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, ope
     # Dimension coeffs
     R0 = dimensions["UNLOADED_RADIUS"]
     
-    df_z = (FZ - FNOMIN * LFZO) / (FNOMIN * LFZO)
+    df_z = (Fz - FNOMIN * LFZO) / (FNOMIN * LFZO)
     
     C_xSA = CCFX3
     B_xSA = CCFX1 * np.cos(np.arctan(CCFX2 * kappa)) * LXAL
@@ -88,13 +88,13 @@ def _combined_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, ope
 
     # This is the same calculation, but the variables are shown a more intuitive way
     G_xSA = (np.cos(C_xSA * np.arctan(B_xSA * SA_s - E_xSA * (B_xSA * SA_s - np.arctan(B_xSA * SA_s))))) / (np.cos(C_xSA * np.arctan(B_xSA * S_HxSA - E_xSA * (B_xSA * S_HxSA - np.arctan(B_xSA * S_HxSA)))))
-    mu_x, FX_0 = _pure_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma)
+    mu_x, FX_0 = _pure_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma)
 
     FX_adj = FX_0 * G_xSA
     
     return mu_x, FX_adj
 
-def _pure_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma) -> float:
+def _pure_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma) -> float:
 
     # Pure long coeffs
     CFX1 = long_coeffs["PCX1"]
@@ -161,16 +161,16 @@ def _pure_long(long_coeffs, scaling_coeffs, vertical_coeffs, dimensions, operati
     R0 = dimensions["UNLOADED_RADIUS"]
 
     IA_x = gamma * LGAX
-    df_z = (FZ - FNOMIN * LFZO) / (FNOMIN * LFZO)
+    df_z = (Fz - FNOMIN * LFZO) / (FNOMIN * LFZO)
     mu_x = (CFX2 + CFX3 * df_z) * (1 - CFX4 * IA_x**2) * LMUX
 
     C_x = CFX1 * LCX
-    D_x = mu_x * FZ
-    K_x = FZ * (CFX9 + CFX10 * df_z) * np.exp(CFX11 * df_z) * LKX
+    D_x = mu_x * Fz
+    K_x = Fz * (CFX9 + CFX10 * df_z) * np.exp(CFX11 * df_z) * LKX
     B_x = K_x / (C_x * D_x)
 
     S_Hx = (CFX12 + CFX13 * df_z) * LHX
-    S_Vx = FZ * (CFX14 + CFX15 * df_z) * LVX * LMUX
+    S_Vx = Fz * (CFX14 + CFX15 * df_z) * LVX * LMUX
     SR_x = kappa + S_Hx
 
     E_x = (CFX5 + CFX6 * df_z + CFX7 * df_z**2) * (1 - CFX8 * np.sign(kappa)) * LEX

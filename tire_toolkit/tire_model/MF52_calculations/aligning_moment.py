@@ -1,15 +1,15 @@
 import numpy as np
 
-from tire_toolkit.assets.tire_model.MF52_calculations._longitudinal_force import get_F_x
-from tire_toolkit.assets.tire_model.MF52_calculations._lateral_force import get_F_y
+from tire_toolkit.tire_model.MF52_calculations.longitudinal_force import get_Fx
+from tire_toolkit.tire_model.MF52_calculations.lateral_force import get_Fy
 
-def get_M_z(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma):
+def get_Mz(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma):
     
-    combined_aligning = _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma)
+    combined_aligning = _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma)
 
     return combined_aligning
 
-def _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma):
+def _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma):
     
     # Pure aligning coeffs
     CMZ1 = aligning_coeffs["QBZ1"]
@@ -144,7 +144,7 @@ def _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs,
     # Dimension coeffs
     R0 = dimensions["UNLOADED_RADIUS"]
 
-    df_z = (FZ - FNOMIN * LFZO) / (FNOMIN * LFZO)
+    df_z = (Fz - FNOMIN * LFZO) / (FNOMIN * LFZO)
     IA_z = gamma * LGAZ
 
     ### Pure slip dependencies
@@ -153,23 +153,23 @@ def _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs,
     IA_y = gamma * LGAY
     mu_y = (CFY2 + CFY3 * df_z) * (1 - CFY4 * IA_y**2) * LMUY
     S_Hy = (CFY12 + CFY13 * df_z) * LHY + CFY14 * IA_y
-    S_Vy = FZ * ((CFY15 + CFY16 * df_z) * LVY + (CFY17 + CFY18 * df_z) * IA_y) * LMUY
+    S_Vy = Fz * ((CFY15 + CFY16 * df_z) * LVY + (CFY17 + CFY18 * df_z) * IA_y) * LMUY
 
-    K_y = CFY9 * FNOMIN * np.sin(2 * np.arctan(FZ / (CFY10 * FNOMIN * LFZO))) * \
+    K_y = CFY9 * FNOMIN * np.sin(2 * np.arctan(Fz / (CFY10 * FNOMIN * LFZO))) * \
         (1 - CFY11 * abs(IA_y)) * LFZO * LKY
     C_y = CFY1 * LCY
-    D_y = mu_y * FZ
+    D_y = mu_y * Fz
     B_y = K_y / (C_y * D_y)
 
     # Longitudinal
-    K_x = FZ * (CFX9 + CFX10 * df_z) * np.exp(CFX11 * df_z) * LKX
+    K_x = Fz * (CFX9 + CFX10 * df_z) * np.exp(CFX11 * df_z) * LKX
     
     # Aligning
-    D_t = FZ * (CMZ9 + CMZ10 * df_z) * (1 + CMZ11 * IA_z + CMZ12 * IA_z**2) * (R0 / FNOMIN) * LTR
+    D_t = Fz * (CMZ9 + CMZ10 * df_z) * (1 + CMZ11 * IA_z + CMZ12 * IA_z**2) * (R0 / FNOMIN) * LTR
     C_t = CMZ8
     B_t = (CMZ1 + CMZ2 * df_z + CMZ3 * df_z**2) * (1 + CMZ4 * IA_z + CMZ5 * abs(IA_z)) * LKY / LMUY
     
-    D_VySR = mu_y * FZ * (CCFY9 + CCFY10 * df_z + CCFY11 * gamma) * np.cos(np.arctan(CCFY12 * alpha))
+    D_VySR = mu_y * Fz * (CCFY9 + CCFY10 * df_z + CCFY11 * gamma) * np.cos(np.arctan(CCFY12 * alpha))
     S_VySR = D_VySR * np.sin(CCFY13 * np.arctan(CCFY14 * kappa)) * LVYKA
 
     S_Ht = CMZ22 + CMZ23 * df_z + (CMZ24 + CMZ25 * df_z) * IA_z
@@ -188,31 +188,31 @@ def _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs,
     t_adj = D_t * np.cos(C_t * np.arctan(B_t * SA_t_eq - E_t * (B_t * SA_t_eq - np.arctan(B_t * SA_t_eq)))) * np.cos(alpha)
 
     # FX = self._combined_long([FZ, SA, SR, IA])
-    FX = get_F_x(
-        long_coeffs,
-        scaling_coeffs, 
-        vertical_coeffs,
-        dimensions,
-        operating_conditions,
-        FZ,
-        alpha,
-        kappa,
-        gamma)[1]
+    FX = get_Fx(
+        long_coeffs=long_coeffs,
+        scaling_coeffs=scaling_coeffs, 
+        vertical_coeffs=vertical_coeffs,
+        dimensions=dimensions,
+        operating_conditions=operating_conditions,
+        Fz=Fz,
+        alpha=alpha,
+        kappa=kappa,
+        gamma=gamma)[1]
     
-    FY = get_F_y(
+    FY = get_Fy(
         lat_coeffs = lat_coeffs,
         scaling_coeffs = scaling_coeffs,
         vertical_coeffs = vertical_coeffs,
         dimensions = dimensions,
         operating_conditions = operating_conditions,
-        FZ = FZ,
+        Fz = Fz,
         alpha = alpha,
         kappa = kappa,
         gamma = gamma)[1]
 
     F_y_IA_adj = FY - S_VySR
 
-    D_r = FZ * ((CMZ13 + CMZ14 * df_z) * LRES + (CMZ15 + CMZ16 * df_z) * IA_z) * R0 * LMUY
+    D_r = Fz * ((CMZ13 + CMZ14 * df_z) * LRES + (CMZ15 + CMZ16 * df_z) * IA_z) * R0 * LMUY
     B_r = CMZ6 * LKY / LMUY + CMZ7 * B_y * C_y
 
     M_zr = D_r * np.cos(np.arctan(B_r * SA_r_eq)) * np.cos(alpha)
@@ -223,7 +223,7 @@ def _combined_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs,
 
     return [t_adj, MZ_adj]
 
-def _pure_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, FZ, alpha, kappa, gamma) -> float:
+def _pure_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, vertical_coeffs, dimensions, operating_conditions, Fz, alpha, kappa, gamma) -> float:
     
     # Pure aligning coeffs
     CMZ1 = aligning_coeffs["QBZ1"]
@@ -327,29 +327,29 @@ def _pure_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, ver
     # Dimension coeffs
     R0 = dimensions["UNLOADED_RADIUS"]
 
-    df_z = (FZ - FNOMIN * LFZO) / (FNOMIN * LFZO)
+    df_z = (Fz - FNOMIN * LFZO) / (FNOMIN * LFZO)
     IA_z = gamma * LGAZ
 
     # Lateral Dependencies
     IA_y = gamma * LGAY
     mu_y = (CFY2 + CFY3 * df_z) * (1 - CFY4 * IA_y**2) * LMUY
     S_Hy = (CFY12 + CFY13 * df_z) * LHY + CFY14 * IA_y
-    S_Vy = FZ * ((CFY15 + CFY16 * df_z) * LVY + (CFY17 + CFY18 * df_z) * IA_y) * LMUY
+    S_Vy = Fz * ((CFY15 + CFY16 * df_z) * LVY + (CFY17 + CFY18 * df_z) * IA_y) * LMUY
 
-    K_y = CFY9 * FNOMIN * np.sin(2 * np.arctan(FZ / (CFY10 * FNOMIN * LFZO))) * \
+    K_y = CFY9 * FNOMIN * np.sin(2 * np.arctan(Fz / (CFY10 * FNOMIN * LFZO))) * \
         (1 - CFY11 * abs(IA_y)) * LFZO * LKY
     C_y = CFY1 * LCY
-    D_y = mu_y * FZ
+    D_y = mu_y * Fz
     B_y = K_y / (C_y * D_y)
 
     # Pure Aligning Moment
     S_Ht = CMZ22 + CMZ23 * df_z + (CMZ24 + CMZ25 * df_z) * IA_z
     SA_t = alpha + S_Ht
 
-    D_r = FZ * ((CMZ13 + CMZ14 * df_z) * LRES + (CMZ15 + CMZ16 * df_z) * IA_z) * R0 * LMUY
+    D_r = Fz * ((CMZ13 + CMZ14 * df_z) * LRES + (CMZ15 + CMZ16 * df_z) * IA_z) * R0 * LMUY
     B_r = CMZ6 * LKY / LMUY + CMZ7 * B_y * C_y
 
-    D_t = FZ * (CMZ9 + CMZ10 * df_z) * (1 + CMZ11 * IA_z + CMZ12 * IA_z**2) * (R0 / FNOMIN) * LTR
+    D_t = Fz * (CMZ9 + CMZ10 * df_z) * (1 + CMZ11 * IA_z + CMZ12 * IA_z**2) * (R0 / FNOMIN) * LTR
     C_t = CMZ8
     B_t = (CMZ1 + CMZ2 * df_z + CMZ3 * df_z**2) * (1 + CMZ4 * IA_z + CMZ5 * abs(IA_z)) * LKY / LMUY
 
@@ -366,13 +366,13 @@ def _pure_aligning(aligning_coeffs, scaling_coeffs, lat_coeffs, long_coeffs, ver
     # Pneumatic trail
     t = D_t * np.cos(C_t * np.arctan(B_t * SA_t - E_t * (B_t * SA_t - np.arctan(B_t * SA_t)))) * np.cos(alpha)
 
-    FY = get_F_y(
+    FY = get_Fy(
         lat_coeffs = lat_coeffs,
         scaling_coeffs = scaling_coeffs,
         vertical_coeffs = vertical_coeffs,
         dimensions = dimensions,
         operating_conditions = operating_conditions,
-        FZ = FZ,
+        Fz = Fz,
         alpha = alpha,
         kappa = kappa,
         gamma = gamma)[1]
