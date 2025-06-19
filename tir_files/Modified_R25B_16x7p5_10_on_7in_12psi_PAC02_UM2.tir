@@ -79,7 +79,7 @@ $-----------------------------------------------------------------SHAPE
  0.9    1.0
 $-----------------------------------------------------------------STRUCTURAL
 [STRUCTURAL]
-LATERAL_STIFFNESS        = 1e30                     $Lateral Stiffness (Added as a placeholder by rhorvath@utexas.edu)
+LATERAL_STIFFNESS        = 1e30                     $Lateral Stiffness
 $-----------------------------------------------------------------PARAMETER
 [VERTICAL]
 FNOMIN                   =  654                     $Nominal wheel load
@@ -145,7 +145,7 @@ PDX2                     =  -0.618826               $Variation of friction Mux w
 PDX3                     =  11.156379               $Variation of friction Mux with camber
 PEX1                     =  0                       $Longitudinal curvature Efx at Fznom
 PEX2                     =  -0.141806               $Variation of curvature Efx with load
-PEX3                     =  -1.934950               $Variation of curvature Efx with load squared
+PEX3                     =  0                       $Variation of curvature Efx with load squared
 PEX4                     =  -0.044722               $Factor in curvature Efx while driving
 PKX1                     =  55.079922               $Longitudinal slip stiffness Kfx/Fz at Fznom
 PKX2                     =  -0.000017               $Variation of slip stiffness Kfx/Fz with load
